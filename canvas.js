@@ -12,7 +12,7 @@ const friction = 0.9;
 var limit = 600;
 
 var cloudArr = [];
-var cloud_num = 3;
+var cloud_num = 8;
 
 function loadImages(sources, callback) {
     var images = {};
