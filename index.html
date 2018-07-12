@@ -9,16 +9,17 @@
         body{
             margin:0;
             padding:0;
+            background: #3568cc;
         }
         @-webkit-keyframes MOVE-BG {
             0% {
-                background-position: 0% 0%
+                background-position: 0% -15%
             }
             50% { 
-                background-position: 0% -20%
+                background-position: 0% -10%
             }
             100% {
-                background-position: 0% 0%
+                background-position: 0% -15%
 
             }
         }   
@@ -26,9 +27,9 @@
             width: 100vw;
             height: 100vh;
             background: url("src/background.png") fixed;
-            
+            background-position: 0% -15%;
             -webkit-animation-name: MOVE-BG;
-            -webkit-animation-duration: 10s;
+            -webkit-animation-duration: 1s;
             -webkit-animation-timing-function: linear;
             -webkit-animation-iteration-count: infinite;
         }
@@ -45,6 +46,7 @@
             position:fixed;
             bottom:0;
             margin:auto;
+            display: none;
         }
     </style>
 </head>
