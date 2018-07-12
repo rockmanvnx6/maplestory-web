@@ -12,8 +12,10 @@ const friction = 0.9;
 var limit = 600;
 
 var cloudArr = [];
+var treeArr = [];
+var bushArr = [];
 var cloud_num = 8;
-
+var tree_num = 2;
 function loadImages(sources, callback) {
     var images = {};
     var loadedImages = 0;
@@ -31,6 +33,8 @@ function loadImages(sources, callback) {
       };
       images[src].src = sources[src];
     }
+    console.log(images);
+
   }
 var sources = {
     /* walk */
@@ -65,22 +69,87 @@ var sources = {
     "swingO1_2_1": "src/swingO1_2_1.png",
 
     /* tree*/
-
-    "tree0": "src/tree0.png",
-    "tree1": "src/tree1.png",
+    "corner_tree": "src/corner-tree.png",
+    "default_tree": "src/tree.png",
 
     /* ground */
     "ground": "src/ground.png",
 
     /* cloud */
-    "cloud": "src/cloud.png",
-
-
+    "cloud0":"src/__resource___cloud_pack_by_bathtoys-danfp8d/Sunset/Sunset (1).png",
+    "cloud1":"src/__resource___cloud_pack_by_bathtoys-danfp8d/Sunset/Sunset (10).png",
+    "cloud2":"src/__resource___cloud_pack_by_bathtoys-danfp8d/Sunset/Sunset (13).png",
+    /* bush */
+    "bush0":"src/bush.png",
 
 
 };
-console.log(typeof(sources));
 loadImages(sources,function (images){
+
+    drawMap = {
+        ratio: undefined,
+        buffer:document.createElement("canvas").getContext("2d"),
+        context:document.querySelector("canvas").getContext("2d"),
+        tile : {
+            image: new Image(),
+            columns: 3,
+            height_t: 60,
+            width_t: 90,
+        },
+
+        render : function () {
+            for(let index = map.setup.length - 1; index > -1; --index) {
+                var value = map.setup[index];
+
+                var cut_x = (value % this.tile.columns) * this.tile.width_t;
+                var cut_y = Math.floor(value / this.tile.columns) * this.tile.height_t;
+
+                var final_x = (index % map.columns) * this.tile.width_t;
+                var final_y = Math.floor(index / map.columns) * this.tile.height_t;
+                this.buffer.drawImage(this.tile.image,cut_x,cut_y,this.tile.width_t,this.tile.height_t,final_x,final_y,this.tile.width_t,this.tile.height_t);
+            }
+
+            this.context.drawImage(this.buffer.canvas,0,0,map.width_t,map.height_t,0,0,this.context.canvas.width, this.context.canvas.height)
+        },
+
+        resize: function () {
+            drawMap.context.canvas.width = document.documentElement.clientWidth - 90;
+
+            if(drawMap.context.canvas.width > document.documentElement.clientHeight - 60) {
+                display.context.canvas.width = document.documentElement.clientHeight -60;
+            }
+
+            drawMap.context.canvas.height = drawMap.context.canvas.width * drawMap.ratio;
+
+            drawMap.buffer.imageSmoothingEnabled = drawMap.buffer.imageSmoothingEnabled = false;
+            drawmap.render();
+        }
+    },
+    map = {
+        setup: [
+            6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+            6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+            6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+            6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+            6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+            6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+            6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+            6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+            6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+            6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+            6,6,6,6,6,6,6,6,6,8,1,1,1,1,1,1,1,1,1,1,1,1,
+            1,1,1,1,1,1,1,1,1,4,4,4,4,4,4,4,4,4,4,4,4,4,
+            4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+            4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+            4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+            4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+            4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+            7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+        ],
+        columns: 22,
+        height_t: canvas.height,
+        width_t: canvas.width,
+    },
 
     controller = {
         left: false,
@@ -203,7 +272,6 @@ loadImages(sources,function (images){
             }
             var selector = object.mode + "_" + + object.num.toString() +"_"+object.flip;
             c.drawImage(images[selector],object.x,object.y,object.width,object.height);
-            console.log(images[selector]);
             // img.src = "src/"+object.mode+"_" + object.num.toString() +"_"+object.flip+".png";
             // c.fillRect(object.x,object.y,object.width,object.height);
             // c.drawImage(img,object.x,object.y,object.width,object.height);
@@ -251,12 +319,8 @@ loadImages(sources,function (images){
 
         },
         control: function () {
-            c.clearRect(0,0,innerWidth,innerHeight);
             object.second += 1;
-            cloudRender(cloudArr);
-            tree0.draw();
-            tree1.draw();
-            ground.draw();
+            // ground.draw();
             object.draw();
             object.action();
             object.dy += 1.5;
@@ -271,7 +335,6 @@ loadImages(sources,function (images){
             object.dx *= friction; // velocity giam dan
             object.dy *= friction; // velocity giam dan
 
-            requestAnimationFrame(object.control);
         }
 
     };
@@ -280,40 +343,24 @@ loadImages(sources,function (images){
         + "<br />" + "object.num: " + object.num + "<br />" + "object.width: " + object.width + "<br />" + "object.height: " + object.height + "<br />" + "object.second: " + object.second;
     }
 
-    ground = {
-        width: 1792,
-        height: 1317,
-        draw: function () {
+    function Tree(width,height,x,y,type) {
+        this.width = width;
+        this.height = height;
+        this.type = type;
+        this.x = x;
+        this.y = y;
+        this.render= function () {
             c.beginPath();
-            c.drawImage(images["ground"],0,0,ground.width,ground.height);
+            c.drawImage(images[type],this.x,this.y,this.width,this.height);
         }
     }
-
-    tree0 = {
-        width: 407,
-        height: 615,
-        draw: function() {
-            c.beginPath();
-            c.drawImage(images["tree0"],500,100,tree0.width,tree0.height);
-        }
-    }
-
-    tree1 = {
-        width: 497,
-        height: 641,
-        draw: function() {
-            var img = new Image;
-            c.beginPath();
-            c.drawImage(images["tree1"],1400,100,tree0.width,tree0.height);
-        }
-    }
-
     function Cloud(x,y,width,height,dx){
         this.width= width;
         this.height= height;
         this.dx = dx;
         this.x = x;
         this.y = y;
+        var randomCloud = Math.floor(Math.random()*3);
         this.limit = function () {
             if(this.x > canvas.width) {
                 this.x = -this.width;
@@ -321,7 +368,8 @@ loadImages(sources,function (images){
         }
         this.draw = function() {
             c.beginPath();
-            c.drawImage(images["cloud"],this.x,this.y,this.width,this.height);
+            var name = "cloud" + randomCloud;
+            c.drawImage(images[name],this.x,this.y,this.width,this.height);
         }
         this.render = function () {
             this.limit();
@@ -329,24 +377,57 @@ loadImages(sources,function (images){
             this.x += this.dx;
         }
     } 
-
+    function Bush(x,y,width,height,type) {
+        this.width = width;
+        this.height = height;
+        this.type = type;
+        this.x = x;
+        this.y = y;
+        this.render= function () {
+            c.beginPath();
+            c.drawImage(images[type],this.x,this.y,this.width,this.height);
+        }
+    }
     function init() {
+        cloudArr = [];
+        treeArr = [];
+        bushArr = [];
         for(var i = 0; i < cloud_num; i++) {
             var randomX = Math.random()*canvas.width;
             var randomY = Math.random()*150;
             var randomDX = Math.random()*3;
             cloudArr.push(new Cloud(randomX,randomY,200,102,randomDX));
-        }
+        };
+        treeArr.push(new Tree(230,381,0,300,"corner_tree"));
+        treeArr.push(new Tree(1047,878,550,-250,"default_tree"));
+        bushArr.push(new Bush(630,570,160,118,"bush0"));
     }
 
-    function cloudRender(arr) {
+    function objectRender(arr) {
         for(let i = 0; i < arr.length; i++) {
             arr[i].render();
         }
     }
 
+    function animation() {
+        c.clearRect(0,0,innerWidth,innerHeight);
+        objectRender(cloudArr);
+        objectRender(treeArr);
+        requestAnimationFrame(animation);
+        object.control();
+        objectRender(bushArr);
+        drawMap.render();
+    }
     init();
-    requestAnimationFrame(object.control);
+    window.addEventListener("resize",init,false);
     window.addEventListener("keydown",controller.keyListener,false);
     window.addEventListener("keyup",controller.keyListener,false);
+    drawMap.tile.image.addEventListener("load", function (a) {
+        drawMap.buffer.canvas.height = map.height_t;
+        drawMap.buffer.canvas.width = map.width_t;
+        drawMap.ratio = map.height_t/map.width_t;
+    });
+    drawMap.tile.image.src = "src/tile1.png";
+    animation();
+
 });
