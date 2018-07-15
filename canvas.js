@@ -9,8 +9,8 @@ const velocity_y = 30;
 const velocity_x = 0.5
 const friction = 0.9;
 
-var limit = 600;
-
+var limit = 0;
+var value_x;
 var cloudArr = [];
 var treeArr = [];
 var bushArr = [];
@@ -82,6 +82,9 @@ var sources = {
     /* bush */
     "bush0":"src/bush.png",
 
+    /* tiles */
+    "tile" : "src/tile1.png"
+
 
 };
 loadImages(sources,function (images){
@@ -98,7 +101,7 @@ loadImages(sources,function (images){
         },
 
         render : function () {
-            for(let index = map.setup.length - 1; index > -1; --index) {
+            for(let index = 0; index < map.setup.length; index++) {
                 var value = map.setup[index];
 
                 var cut_x = (value % this.tile.columns) * this.tile.width_t;
@@ -106,6 +109,30 @@ loadImages(sources,function (images){
 
                 var final_x = (index % map.columns) * this.tile.width_t;
                 var final_y = Math.floor(index / map.columns) * this.tile.height_t;
+                var current_pos0 = Math.floor(object.x);
+                if(value == 8) {
+                    if( (final_x > current_pos0 && current_pos0 > final_x - 50) && (object.y >= final_y) && object.flip == 1){
+                        object.block = true;
+                    } else{
+                        object.block = false;
+                    }
+                    if(object.block == false) {
+                        object.x += object.dx;
+                    } else {
+                        object.x += 0;
+                    }
+                }
+                if(value == 1 || value == 8){
+                    value_x = final_y;
+                    if(final_x + this.tile.width_t-25 >= current_pos0 && current_pos0 > final_x-35 && object.y <= final_y+60) {
+                        limit = final_y-60;
+                    }
+                    if(object.y > limit) {
+                        object.y = limit;
+                        object.dy = 0;
+                        object.jump = false;
+                    }
+                }
                 this.buffer.drawImage(this.tile.image,cut_x,cut_y,this.tile.width_t,this.tile.height_t,final_x,final_y,this.tile.width_t,this.tile.height_t);
             }
 
@@ -135,8 +162,8 @@ loadImages(sources,function (images){
             6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
             6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
             6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
-            6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
-            6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+            6,6,6,6,6,6,1,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+            6,6,6,6,6,6,7,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
             6,6,6,6,6,6,6,6,6,8,1,1,1,1,1,1,1,1,1,1,1,1,
             1,1,1,1,1,1,1,1,1,4,4,4,4,4,4,4,4,4,4,4,4,4,
             4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
@@ -213,7 +240,6 @@ loadImages(sources,function (images){
         },
         draw: function () {
             c.beginPath();
-            // var img = new Image;   
             if(object.second % 15 == 0) {
                 object.count += 1;
             }
@@ -271,10 +297,8 @@ loadImages(sources,function (images){
                 object.height = 76;
             }
             var selector = object.mode + "_" + + object.num.toString() +"_"+object.flip;
-            c.drawImage(images[selector],object.x,object.y,object.width,object.height);
-            // img.src = "src/"+object.mode+"_" + object.num.toString() +"_"+object.flip+".png";
             // c.fillRect(object.x,object.y,object.width,object.height);
-            // c.drawImage(img,object.x,object.y,object.width,object.height);
+            c.drawImage(images[selector],object.x,object.y,object.width,object.height);
             c.closePath();
             c.beginPath();
             if(object.hp > 50) {
@@ -295,41 +319,19 @@ loadImages(sources,function (images){
         },
         limit: function () {
 
-            if(object.y > limit) {
-                object.y = limit;
-                object.dy = 0;
-                object.jump = false;
-            }
             if(object.x > innerWidth) {
                 object.x = 0;
             }
             if(object.x < -object.width) {
                 object.x = innerWidth - object.width;
             }
-            if(object.x > 780) {
-                limit = 542;
-            } else {
-                limit = 600;
-            }
-            if( (777 > Math.floor(object.x) && Math.floor(object.x) > 752) && (object.dy == 0) && (object.y == 600) &&object.flip == 1) {
-                object.block = true;
-            } else{
-                object.block = false;
-            }
-
         },
         control: function () {
             object.second += 1;
-            // ground.draw();
             object.draw();
             object.action();
             object.dy += 1.5;
             debugMe();
-            if(object.block == false) {
-                object.x += object.dx;
-            } else {
-                object.x += 0;
-            }
             object.y += object.dy;
             object.limit();
             object.dx *= friction; // velocity giam dan
@@ -340,7 +342,8 @@ loadImages(sources,function (images){
     };
     function debugMe() {
         debug.innerHTML = "object.x: " + object.x + "<br />" + "object.y: " + object.y + "<br />" + "object.dx: " + object.dx + "<br/>" + "object.dy: "+ object.dy +"<br/>"+ "object.block: " + object.block + "<br/>" + "object.jump: " + object.jump + "<br />" + "object.hp: " + object.hp + "<br />" + "object.mode: " + object.mode
-        + "<br />" + "object.num: " + object.num + "<br />" + "object.width: " + object.width + "<br />" + "object.height: " + object.height + "<br />" + "object.second: " + object.second;
+        + "<br />" + "object.num: " + object.num + "<br />" + "object.width: " + object.width + "<br />" + "object.height: " + object.height + "<br />" + "object.second: " + object.second
+        + "<br />" + "value: " + value_x; ;
     }
 
     function Tree(width,height,x,y,type) {
@@ -427,7 +430,7 @@ loadImages(sources,function (images){
         drawMap.buffer.canvas.width = map.width_t;
         drawMap.ratio = map.height_t/map.width_t;
     });
-    drawMap.tile.image.src = "src/tile1.png";
+    drawMap.tile.image.src = images["tile"].src;
     animation();
 
 });
